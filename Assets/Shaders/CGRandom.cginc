@@ -63,8 +63,8 @@ float biquinticInterpolation(float v[4], float2 t)
     
     float x1 = lerp(v[0], v[1], u.x);
     float x2 = lerp(v[2], v[3], u.x);
-    
-    return 0;
+
+    return lerp(x1, x2, u.y);
 }
 
 // Interpolates a given array v of 8 float values using triquintic interpolation

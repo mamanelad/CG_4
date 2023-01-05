@@ -38,13 +38,14 @@
                 struct v2f
                 {
                     float4 pos      : SV_POSITION;
+                    float2 uv       : TEXCOORD1;
                 };
 
                 // Returns the value of a noise function simulating water, at coordinates uv and time t
                 float waterNoise(float2 uv, float t)
                 {
-                    // Your implementation
-                    return 0;
+                    float noise = perlin2d(uv);
+                    return noise; 
                 }
 
                 // Returns the world-space bump-mapped normal for the given bumpMapData and time t
@@ -59,12 +60,15 @@
                 {
                     v2f output;
                     output.pos = UnityObjectToClipPos(input.vertex);
+                    output.uv = input.uv;
                     return output;
                 }
 
                 fixed4 frag (v2f input) : SV_Target
                 {
-                    return 1;
+                    float water_noise = waterNoise(input.uv * _NoiseScale ,0);
+                    water_noise = (water_noise+1)/2;
+                    return fixed4(water_noise,water_noise,water_noise,1);
                 }
 
             ENDCG

@@ -21,7 +21,7 @@ Material:
     m_TexEnvs: []
     m_Floats:
     - _FillWithRed: 0
-    - _NoiseScale: 10
+    - _NoiseScale: 20
     - _NoiseType: 1
     - _isToggled: 0
     m_Colors: []

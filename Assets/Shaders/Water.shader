@@ -39,6 +39,8 @@
                 {
                     float4 pos      : SV_POSITION;
                     float2 uv       : TEXCOORD1;
+                    float normal    : TEXCOORD2;
+                    float3 worldPos : TEXCOORD3;
                 };
 
                 // Returns the value of a noise function simulating water, at coordinates uv and time t
@@ -58,17 +60,26 @@
 
                 v2f vert (appdata input)
                 {
+                    input.vertex.xyz = input.vertex.xyz + _BumpScale *(input.normal*waterNoise(input.uv * _NoiseScale ,0));
+                    
                     v2f output;
                     output.pos = UnityObjectToClipPos(input.vertex);
                     output.uv = input.uv;
+                    output.normal = mul(unity_ObjectToWorld,input.normal);
+                    output.worldPos = mul(unity_ObjectToWorld,input.vertex);
                     return output;
                 }
 
                 fixed4 frag (v2f input) : SV_Target
                 {
-                    float water_noise = waterNoise(input.uv * _NoiseScale ,0);
-                    water_noise = (water_noise+1)/2;
-                    return fixed4(water_noise,water_noise,water_noise,1);
+                    float3 n = input.normal;
+                    float3 v = normalize(_WorldSpaceCameraPos - input.worldPos);
+                    float3 r = 2 * dot(v,n) * n - v;
+                    
+                    float4 reflectedColor = texCUBE(_CubeMap,r);
+                    float4 color = (1 - max(0, dot(n,v)) + 0.2) * reflectedColor;
+                    
+                    return color;
                 }
 
             ENDCG

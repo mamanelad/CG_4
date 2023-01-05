@@ -32,15 +32,31 @@ fixed3 blinnPhong(float3 n, float3 v, float3 l, float shininess, fixed4 albedo, 
     fixed4 Ambient = ambientIntensity * albedo;
     fixed4 Diffuse = max(0, dot(n,l)) * albedo;
     fixed4 Specular = pow(max(0, dot(n,h)),shininess) * specularity;
-    
     return Ambient + Diffuse + Specular;
 }
 
 // Returns the world-space bump-mapped normal for the given bumpMapData
 float3 getBumpMappedNormal(bumpMapData i)
 {
-    // Your implementation
-    return 0;
+    float3 f_p = tex2D(i.heightMap,i.uv);
+    
+    float2 p_du = i.uv;
+    float2 p_dv = i.uv;
+    p_du.x += i.du;
+    p_dv.y += i.dv;
+    
+    float3 f_du = tex2D(i.heightMap,p_du);
+    float3 f_dv = tex2D(i.heightMap,p_dv);
+    
+    float der_u = (f_du - f_p) / i.du;
+    float der_v = (f_dv - f_p) / i.dv;
+
+    float3 nt = float3((-1 * der_u * i.bumpScale) , (-1 * der_v * i.bumpScale) , 1);
+    nt = normalize(nt);
+
+    float3 b = normalize(cross(i.tangent,i.normal));
+    
+    return (normalize((i.tangent* nt.x) + (i.normal * nt.z) + (b * nt.y)));
 }
 
 

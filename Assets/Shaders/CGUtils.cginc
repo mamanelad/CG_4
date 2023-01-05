@@ -27,8 +27,13 @@ float2 getSphericalUV(float3 pos)
 // Implements an adjusted version of the Blinn-Phong lighting model
 fixed3 blinnPhong(float3 n, float3 v, float3 l, float shininess, fixed4 albedo, fixed4 specularity, float ambientIntensity)
 {
-    // Your implementation
-    return 0;
+    float3 h = normalize(l+v);
+    
+    fixed4 Ambient = ambientIntensity * albedo;
+    fixed4 Diffuse = max(0, dot(n,l)) * albedo;
+    fixed4 Specular = pow(max(0, dot(n,h)),shininess) * specularity;
+    
+    return Ambient + Diffuse + Specular;
 }
 
 // Returns the world-space bump-mapped normal for the given bumpMapData

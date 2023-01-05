@@ -1,4 +1,6 @@
 #ifndef CG_RANDOM_INCLUDED
+// Upgrade NOTE: excluded shader from DX11, OpenGL ES 2.0 because it uses unsized arrays
+#pragma exclude_renderers d3d11 gles
 // Upgrade NOTE: excluded shader from DX11 because it uses wrong array syntax (type[size] name)
 #pragma exclude_renderers d3d11
 #define CG_RANDOM_INCLUDED
@@ -57,7 +59,11 @@ float bicubicInterpolation(float v[4], float2 t)
 // at the given ratio t (a float2 with components between 0 and 1)
 float biquinticInterpolation(float v[4], float2 t)
 {
-    // Your implementation
+    float2 u = t * t * t * ((6.0 * t * t) - (15 * t) + 10); // Cubic interpolation
+    
+    float x1 = lerp(v[0], v[1], u.x);
+    float x2 = lerp(v[2], v[3], u.x);
+    
     return 0;
 }
 
@@ -72,15 +78,41 @@ float triquinticInterpolation(float v[8], float3 t)
 // Returns the value of a 2D value noise function at the given coordinates c
 float value2d(float2 c)
 {
-    // Your implementation
-    return 0;
+    float2 cell = floor(c);
+
+    float2 c00_value = random2(float2(cell.x, cell.y));
+    float2 c01_value = random2(float2(cell.x + 1, cell.y));
+    float2 c10_value = random2(float2(cell.x, cell.y + 1));
+    float2 c11_value = random2(float2(cell.x + 1, cell.y + 1));
+
+    float InterpolationArray[4] = {c00_value.x,c01_value.x,c10_value.x,c11_value.x};
+    return bicubicInterpolation(InterpolationArray, frac(c));
 }
 
 // Returns the value of a 2D Perlin noise function at the given coordinates c
 float perlin2d(float2 c)
 {
-    // Your implementation
-    return 0;
+    float2 cell = floor(c);
+
+    float2 c00 = float2(cell.x, cell.y);
+    float2 c01 = float2(cell.x + 1, cell.y);
+    float2 c10 = float2(cell.x, cell.y + 1);
+    float2 c11 = float2(cell.x + 1, cell.y + 1);
+
+    float2 c00_to_c_vec = c - c00;
+    float2 c01_to_c_vec = c - c01;
+    float2 c10_to_c_vec = c - c10;
+    float2 c11_to_c_vec = c - c11;
+
+    float c00_dot = dot(random2(c00),c00_to_c_vec);
+    float c01_dot = dot(random2(c01),c01_to_c_vec);
+    float c10_dot = dot(random2(c10),c10_to_c_vec);
+    float c11_dot = dot(random2(c11),c11_to_c_vec);
+
+    float InterpolationArray[4] = {c00_dot,c01_dot,c10_dot,c11_dot};
+    
+    return biquinticInterpolation(InterpolationArray, frac(c));
+    // TODO: check why not maching the photo on instructions
 }
 
 // Returns the value of a 3D Perlin noise function at the given coordinates c

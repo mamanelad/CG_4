@@ -71,8 +71,14 @@ float biquinticInterpolation(float v[4], float2 t)
 // at the given ratio t (a float3 with components between 0 and 1)
 float triquinticInterpolation(float v[8], float3 t)
 {
-    // Your implementation
-    return 0;
+    float3 u = t * t * t * ((6.0 * t * t) - (15 * t) + 10);
+
+    float x1[4] = {v[0], v[1], v[2], v[3]};
+    float x2[4] = {v[4], v[5], v[6], v[7]};
+
+    float z1 = biquinticInterpolation(x1, t.xy);
+    float z2 = biquinticInterpolation(x2, t.xy);
+    return lerp(z1, z2, u.z);
 }
 
 // Returns the value of a 2D value noise function at the given coordinates c
@@ -118,8 +124,39 @@ float perlin2d(float2 c)
 // Returns the value of a 3D Perlin noise function at the given coordinates c
 float perlin3d(float3 c)
 {                    
-    // Your implementation
-    return 0;
+    float3 cell = floor(c);
+
+    float3 c000 = float3(cell.x, cell.y,cell.z);
+    float3 c001 = float3(cell.x, cell.y,cell.z+1);
+    float3 c010 = float3(cell.x, cell.y+1,cell.z);
+    float3 c100 = float3(cell.x+1, cell.y,cell.z);
+    float3 c011 = float3(cell.x, cell.y+1,cell.z+1);
+    float3 c110 = float3(cell.x+1, cell.y+1,cell.z);
+    float3 c101 = float3(cell.x+1, cell.y,cell.z+1);
+    float3 c111 = float3(cell.x+1, cell.y+1,cell.z+1);
+
+    float3 c000_to_c_vec = c - c000;
+    float3 c001_to_c_vec = c - c001;
+    float3 c010_to_c_vec = c - c010;
+    float3 c100_to_c_vec = c - c100;
+    float3 c011_to_c_vec = c - c011;
+    float3 c110_to_c_vec = c - c110;
+    float3 c101_to_c_vec = c - c101;
+    float3 c111_to_c_vec = c - c111;
+
+    float c000_dot = dot(random3(c000),c000_to_c_vec);
+    float c001_dot = dot(random3(c001),c001_to_c_vec);
+    float c010_dot = dot(random3(c010),c010_to_c_vec);
+    float c100_dot = dot(random3(c100),c100_to_c_vec);
+    float c011_dot = dot(random3(c011),c011_to_c_vec);
+    float c110_dot = dot(random3(c110),c110_to_c_vec);
+    float c101_dot = dot(random3(c101),c101_to_c_vec);
+    float c111_dot = dot(random3(c111),c111_to_c_vec);
+
+
+    float InterpolationArray[8] = {c000_dot,c001_dot,c010_dot,c100_dot,c011_dot,c110_dot,c101_dot,c111_dot};
+    
+    return triquinticInterpolation(InterpolationArray, frac(c));
 }
 
 

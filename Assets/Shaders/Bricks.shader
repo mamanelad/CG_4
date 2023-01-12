@@ -65,7 +65,7 @@ Shader "CG/Bricks"
                 {
                     bumpMapData bumpData;
                     bumpData.normal = normalize(input.normal);
-                    bumpData.tangent = input.tangent;
+                    bumpData.tangent = normalize(input.tangent);
                     bumpData.uv = input.uv;
                     bumpData.heightMap = _HeightMap;
                     bumpData.bumpScale = _BumpScale / 10000;

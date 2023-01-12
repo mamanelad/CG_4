@@ -53,18 +53,18 @@ Shader "CG/Bricks"
                 v2f vert (appdata input)
                 {
                     v2f output;
-                    output.worldPos = mul(unity_ObjectToWorld,input.vertex);
+                    output.worldPos = mul(unity_ObjectToWorld,input.vertex.xyz);
                     output.pos = UnityObjectToClipPos(input.vertex);
                     output.uv = input.uv;
-                    output.normal = input.normal;
-                    output.tangent = input.tangent;
+                    output.normal = mul(unity_ObjectToWorld, normalize(input.normal));
+                    output.tangent = mul(unity_ObjectToWorld, input.tangent);
                     return output;
                 }
 
                 fixed4 frag (v2f input) : SV_Target
                 {
                     bumpMapData bumpData;
-                    bumpData.normal = input.normal;
+                    bumpData.normal = normalize(input.normal);
                     bumpData.tangent = input.tangent;
                     bumpData.uv = input.uv;
                     bumpData.heightMap = _HeightMap;

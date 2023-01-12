@@ -45,14 +45,16 @@
                     float4 pos : SV_POSITION;
                     float3 obj_pos : TEXCOORD0;
                     float3 normal : TEXCOORD1;
+                    float3 world_pos : TEXCOORD2;
                 };
 
                 v2f vert (appdata input)
                 {
                     v2f output;
                     output.obj_pos = input.vertex;
+                    output.world_pos = mul(unity_ObjectToWorld, input.vertex.xyz);
                     output.pos = UnityObjectToClipPos(input.vertex);
-                    output.normal = normalize(float3(input.vertex.xyz));
+                    output.normal = mul(unity_ObjectToWorld, normalize(input.vertex));
                     return output;
                 }
 

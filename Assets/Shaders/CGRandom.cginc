@@ -123,8 +123,12 @@ float perlin2d(float2 c)
 
 // Returns the value of a 3D Perlin noise function at the given coordinates c
 float perlin3d(float3 c)
-{                    
-    float3 cell = floor(c);
+{              
+    float cell_x = floor(c.x);
+    float cell_y = floor(c.y);
+    float cell_z = floor(c.z);
+
+    float3 cell = float3(cell_x,cell_y,cell_z);
 
     float3 c000 = float3(cell.x, cell.y,cell.z);
     float3 c001 = float3(cell.x, cell.y,cell.z+1);
@@ -153,8 +157,8 @@ float perlin3d(float3 c)
     float c101_dot = dot(random3(c101),c101_to_c_vec);
     float c111_dot = dot(random3(c111),c111_to_c_vec);
 
-
-    float InterpolationArray[8] = {c000_dot,c001_dot,c010_dot,c100_dot,c011_dot,c110_dot,c101_dot,c111_dot};
+    float3 t = float3(c.x-cell.x, c.y-cell.y, c.z-cell.z);
+    float InterpolationArray[8] = {c000_dot,c100_dot,c010_dot,c110_dot,c001_dot,c101_dot,c011_dot,c111_dot};
     
     return triquinticInterpolation(InterpolationArray, frac(c));
 }

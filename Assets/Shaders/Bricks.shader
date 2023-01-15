@@ -16,8 +16,6 @@ Shader "CG/Bricks"
             Tags { "LightMode" = "ForwardBase" }
 
             CGPROGRAM
-// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f members worldPos)
-#pragma exclude_renderers d3d11
 
                 #pragma vertex vert
                 #pragma fragment frag
@@ -56,7 +54,7 @@ Shader "CG/Bricks"
                     output.worldPos = mul(unity_ObjectToWorld,input.vertex.xyz);
                     output.pos = UnityObjectToClipPos(input.vertex);
                     output.uv = input.uv;
-                    output.normal = mul(unity_ObjectToWorld, normalize(input.normal));
+                    output.normal = mul(unity_ObjectToWorld, input.normal);
                     output.tangent = mul(unity_ObjectToWorld, input.tangent);
                     return output;
                 }
@@ -69,6 +67,7 @@ Shader "CG/Bricks"
                     bumpData.uv = input.uv;
                     bumpData.heightMap = _HeightMap;
                     bumpData.bumpScale = _BumpScale / 10000;
+                    
                     bumpData.du =  _HeightMap_TexelSize.x;
                     bumpData.dv = _HeightMap_TexelSize.y;
                     
@@ -79,7 +78,7 @@ Shader "CG/Bricks"
                     fixed4 albedo = tex2D(_AlbedoMap, input.uv);
                     fixed4 specularity = tex2D(_SpecularMap, input.uv);
                     
-                    fixed3 blingPhong = blinnPhong(n,v,l,_Shininess,albedo,specularity,_Ambient);
+                    fixed3 blingPhong = blinnPhong(n, v, l,_Shininess, albedo, specularity, _Ambient);
                     
                     fixed4 col = fixed4(blingPhong,1);
                     return col;

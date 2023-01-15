@@ -29,7 +29,6 @@ float2 getSphericalUV(float3 pos)
     float u = 0.5 + (t / (2*PI));
     float v = 1 - (f/PI);
     float2 projectedCords = float2(u,v);
-    
     return projectedCords;
 }
 
@@ -37,11 +36,12 @@ float2 getSphericalUV(float3 pos)
 fixed3 blinnPhong(float3 n, float3 v, float3 l, float shininess, fixed4 albedo, fixed4 specularity, float ambientIntensity)
 {
     float3 h = normalize(l+v);
-    
-    fixed4 Ambient = ambientIntensity * albedo;
-    fixed4 Diffuse = max(0, dot(n,l)) * albedo;
-    fixed4 Specular = pow(max(0, dot(n,h)),shininess) * specularity;
-    return Ambient + Diffuse + Specular;
+
+    fixed3 myAlbedo = albedo.xyz;
+    fixed3 ambient = ambientIntensity * myAlbedo;
+    fixed3 diffuse = max(0, dot(n,l)) * myAlbedo;
+    fixed3 specular = pow(max(0, dot(n,h)),shininess) * specularity.xyz;
+    return ambient + diffuse + specular;
 }
 
 // Returns the world-space bump-mapped normal for the given bumpMapData
@@ -64,8 +64,8 @@ float3 getBumpMappedNormal(bumpMapData i)
     nt = normalize(nt);
 
     float3 b = normalize(cross(i.tangent,i.normal));
-    
-    return (normalize((i.tangent* nt.x) + (i.normal * nt.z) + (b * nt.y)));
+    float3 ret = normalize((i.tangent* nt.x) + (i.normal * nt.z) + (b * nt.y)); 
+    return ret;
 }
 
 
